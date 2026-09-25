@@ -50,5 +50,5 @@ You only need **one** supported framework:
 - Admin: `/adminvehicleshop` — location-independent NUI (vehicles, categories, markers/locations, finance settings, general settings, no restart)
 - **Finance:** down % + max term (config + admin menu), interval/fee/repo limit (config); auto-charge by playtime; pay + reclaim at the debt office
 
-![Screenshot](screenshot/1.png)
-![Screenshot](screenshot/2.png)
+![Screenshots](screenshots/1.png)
+![Screenshots](screenshots/2.png)
