@@ -49,3 +49,6 @@ You only need **one** supported framework:
 - Players: walk to a marker + **E** (no catalog command; locations show as blips; catalog or debt screen opens by marker type)
 - Admin: `/adminvehicleshop` — location-independent NUI (vehicles, categories, markers/locations, finance settings, general settings, no restart)
 - **Finance:** down % + max term (config + admin menu), interval/fee/repo limit (config); auto-charge by playtime; pay + reclaim at the debt office
+
+![Screenshot](screenshot/1.png)
+![Screenshot](screenshot/2.png)
