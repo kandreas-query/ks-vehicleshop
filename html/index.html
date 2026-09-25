@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KS VehicleShop</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+<div id="app" class="hidden">
+  <div class="bg"></div>
+  <div class="panel" id="panel">
+    <header>
+      <div class="brand">
+        <div class="logo"><img src="img/logo.png" alt="KS"></div>
+        <div>
+          <p data-i18n="subtitle">Premium Deluxe Motorsport • Katalog</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <button id="closeBtn" class="icon-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+    </header>
+
+    <main>
+      <!-- KATALOG: sol liste + bilgi + satın al | sağ 3D viewport -->
+      <section id="tab-catalog" class="tabpage">
+        <div class="showroom">
+          <aside class="side">
+            <div class="side-top">
+              <button id="catBtn"><i class="fa-solid fa-layer-group"></i> <span id="catLabel">Tümü</span> <i class="fa-solid fa-chevron-down"></i></button>
+              <span id="count">0 araç</span>
+            </div>
+            <div id="catCard" class="hidden">
+              <input id="search" data-i18n-ph="search_vehicles" placeholder="Araç ara...">
+              <div id="catList"></div>
+            </div>
+            <div id="vehList"></div>
+            <div id="detail" class="hidden">
+              <h2 id="d-label"></h2>
+              <p id="d-brand"></p>
+              <div class="d-rows">
+                <div><span data-i18n="price">Fiyat</span><b id="d-price" class="price"></b></div>
+                <div id="d-stockrow"><span data-i18n="stock">Stok</span><b id="d-stock"></b></div>
+              </div>
+              <div class="d-btns">
+                <button id="buyBtn" class="buy"><i class="fa-solid fa-key"></i> <span data-i18n="buy">Satın Al</span></button>
+                <button id="tdBtn" class="td"><i class="fa-solid fa-flag-checkered"></i> <span data-i18n="testdrive">Test Sürüşü</span></button>
+              </div>
+              <div id="payRow">
+                <label><span data-i18n="pay_with">Ödeme</span><select id="payAccount"><option value="bank" data-i18n="pay_bank">Banka</option><option value="cash" data-i18n="pay_cash">Nakit</option></select></label>
+              </div>
+              <div id="finBox" class="hidden">
+                <div class="d-rows">
+                  <div><span><span data-i18n="down_payment">Peşinat</span> (<b id="f-pct"></b>)</span><b id="f-down" class="price"></b></div>
+                  <div><span data-i18n="installment">Taksit</span><b id="f-inst"></b></div>
+                </div>
+                <label><span data-i18n="term">Vade</span><select id="f-count"></select></label>
+                <div class="d-btns">
+                  <button id="finBtn" class="buy"><i class="fa-solid fa-calendar-check"></i> <span data-i18n="buy_finance">Taksitle Al</span></button>
+                </div>
+              </div>
+            </div>
+          </aside>
+          <div id="viewport">
+            <div id="viewHint"><i class="fa-solid fa-computer-mouse"></i> <span data-i18n="view_hint">Fare Sol Tıklama: İnceleme</span></div>
+            <div id="viewEmpty" data-i18n="view_empty">Bir araç seç, sağda 3D belirsin</div>
+            <div id="paintPanel" class="hidden">
+              <div id="palette" class="hidden">
+                <div id="svBox"><div id="svCur"></div></div>
+                <div id="hueBar"><div id="hueCur"></div></div>
+                <div class="pal-row"><div id="palPrev"></div><span id="palHex">#ff0000</span></div>
+              </div>
+              <button id="brushBtn" data-i18n-title="brush_title" title="Rengi değiştir"><i class="fa-solid fa-paintbrush"></i></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- BORÇ OFİSİ: taksit borçları + hacizli araçlar -->
+      <section id="tab-finance" class="tabpage hidden">
+        <div class="fin-wrap">
+          <div class="card">
+            <h3><i class="fa-solid fa-file-invoice-dollar"></i> <span data-i18n="debts">Borçlarım</span></h3>
+            <div id="debtList"></div>
+          </div>
+          <div class="card">
+            <h3><i class="fa-solid fa-warehouse"></i> <span data-i18n="repossessed">Hacizli Araçlarım</span></h3>
+            <p class="hint" data-i18n="repo_hint">Geciken taksitler + cezayı ödeyerek geri alabilirsin.</p>
+            <div id="repoList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ADMİN (sadece /adminvehicleshop komutuyla) -->
+      <section id="tab-admin" class="tabpage hidden">
+        <div class="admin-head">
+          <h2><i class="fa-solid fa-screwdriver-wrench"></i> <span data-i18n="admin_title">VehicleShop Yönetim</span></h2>
+          <span class="hint" data-i18n="admin_hint">Tüm değişiklikler anında geçerli, restart gerekmez.</span>
+        </div>
+        <div class="admin-tabs">
+          <button class="atab active" data-atab="vehicles"><i class="fa-solid fa-car"></i> <span data-i18n="tab_vehicles">Araçlar</span></button>
+          <button class="atab" data-atab="cats"><i class="fa-solid fa-tags"></i> <span data-i18n="tab_cats">Kategoriler</span></button>
+          <button class="atab" data-atab="places"><i class="fa-solid fa-font"></i> <span data-i18n="tab_places">DrawText</span></button>
+          <button class="atab" data-atab="settings"><i class="fa-solid fa-gear"></i> <span data-i18n="tab_settings">Ayarlar</span></button>
+        </div>
+        <div class="atabpage" id="atab-vehicles">
+          <form id="vehForm" class="card">
+            <h3><i class="fa-solid fa-plus"></i> <span data-i18n="form_title">Araç Ekle / Düzenle</span></h3>
+            <label><span data-i18n="f_model">Spawn Kodu (model)*</span><input name="model" required placeholder="zentorno"></label>
+            <div class="row2">
+              <label><span data-i18n="f_label">Etiket</span><input name="label" placeholder="Zentorno"></label>
+              <label><span data-i18n="f_brand">Marka</span><input name="brand" placeholder="Pegassi"></label>
+            </div>
+            <div class="row2">
+              <label><span data-i18n="f_category">Kategori</span><select name="category" id="f-cat"></select></label>
+              <label><span data-i18n="f_image">Resim URL (opsiyonel)</span><input name="image" placeholder="https://...png"></label>
+            </div>
+            <div class="row2">
+              <label><span data-i18n="f_price">Fiyat*</span><input name="price" type="number" min="0" value="100000"></label>
+              <label><span data-i18n="f_stock">Stok*</span><input name="stock" type="number" min="0" value="5"></label>
+            </div>
+            <div class="form-btns">
+              <button type="submit" class="buy"><i class="fa-solid fa-floppy-disk"></i> <span data-i18n="save">Kaydet</span></button>
+              <button type="button" id="formClear" class="ghost"><span data-i18n="clear">Temizle</span></button>
+            </div>
+          </form>
+          <div class="card" id="vehListCard">
+            <h3><i class="fa-solid fa-list"></i> <span data-i18n="tab_vehicles">Araçlar</span></h3>
+            <input id="adminSearch" data-i18n-ph="search_admin" placeholder="Ara...">
+            <div id="adminList"></div>
+          </div>
+        </div>
+        <div class="atabpage hidden" id="atab-cats">
+          <div class="card" id="catsCard">
+            <h3><i class="fa-solid fa-tags"></i> <span data-i18n="cats_title">Kategoriler</span></h3>
+            <p class="hint" data-i18n="cats_hint">Kapalı kategori katalogda görünmez.</p>
+            <div id="catToggles"></div>
+          </div>
+        </div>
+        <div class="atabpage hidden" id="atab-places">
+          <div class="card" id="showCard">
+            <h3><i class="fa-solid fa-font"></i> <span data-i18n="show_title">DrawText / Konumlar</span></h3>
+            <p class="hint" data-i18n="show_hint">Her satırın DrawText yazısı oyunda [E] önekiyle görünür.</p>
+            <div id="showList"></div>
+            <hr>
+            <label><span data-i18n="show_new_label">Yeni Etiket</span><input id="ns-label" placeholder="Galeri"></label>
+            <label><span data-i18n="show_help">Yardım Yazısı</span><input id="ns-help" placeholder="..."></label>
+            <label><span data-i18n="show_kind">Marker Türü</span><select id="ns-kind"><option value="gallery" data-i18n="kind_gallery">Katalog</option><option value="finance" data-i18n="kind_finance">Borç Ofisi</option></select></label>
+            <div class="form-btns">
+              <button type="button" id="ns-add" class="buy"><i class="fa-solid fa-plus"></i> <span data-i18n="show_add">Bulunduğum Yere Ekle</span></button>
+            </div>
+            <p class="hint" data-i18n="show_add_hint">Ekleme, menüye girdiğin konuma yapılır.</p>
+          </div>
+        </div>
+        <div class="atabpage hidden" id="atab-settings">
+          <form id="setForm" class="card">
+            <h3><i class="fa-solid fa-gear"></i> <span data-i18n="set_title">Genel Ayarlar</span></h3>
+            <div class="row2">
+              <label><span data-i18n="set_currency">Para Birimi</span><input name="currency" id="s-currency" maxlength="8"></label>
+            </div>
+            <label><span data-i18n="set_drawpos">DrawText Konumu</span><select id="s-drawpos"><option value="left" data-i18n="pos_left">Sol</option><option value="top" data-i18n="pos_top">Üst</option><option value="right" data-i18n="pos_right">Sağ</option></select></label>
+            <div class="row2">
+              <label class="chk"><input type="checkbox" id="s-test"> <span data-i18n="set_test">Test Sürüşü</span></label>
+              <label><span data-i18n="set_duration">Süre (sn)</span><input id="s-testdur" type="number" min="10" max="600"></label>
+            </div>
+            <label class="chk"><input type="checkbox" id="s-rotate"> <span data-i18n="set_rotate">3D Döndürme</span></label>
+            <label class="chk"><input type="checkbox" id="s-paint"> <span data-i18n="set_paint">Renk Paneli</span></label>
+            <label class="chk"><input type="checkbox" id="s-stock"> <span data-i18n="set_stock">Stok Sistemi</span></label>
+            <h4 data-i18n="set_fin">Taksitli Satış</h4>
+            <label class="chk"><input type="checkbox" id="s-fin"> <span data-i18n="set_fin_on">Taksit Açık</span></label>
+            <div class="row2">
+              <label><span data-i18n="set_down">Peşinat %</span><input id="s-down" type="number" min="0" max="95"></label>
+              <label><span data-i18n="set_maxinst">Max Taksit</span><input id="s-maxinst" type="number" min="1" max="60"></label>
+            </div>
+            <div class="form-btns">
+              <button type="submit" class="buy"><i class="fa-solid fa-floppy-disk"></i> <span data-i18n="save">Kaydet</span></button>
+            </div>
+            <p class="hint" id="setStatus"></p>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+      <div id="modal" class="hidden">
+    <div class="mbox">
+      <p id="m-msg"></p>
+      <div class="m-btns">
+        <button id="m-cancel" class="ghost"><span data-i18n="cancel">Vazgeç</span></button>
+        <button id="m-ok" class="buy"><span data-i18n="ok">Evet</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
